@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #000000;
+      /* เปลี่ยนสีพื้นหลังให้สว่างขึ้น */
+      background-image: url('/public/img/meetingroomart_2.jpg');
+      background-size: cover;
+      background-position: center;
+      /* จัดการสีพื้นหลังและตำแหน่งของรูป */
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .card {
+      width: 60%;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+      background-color: rgba(255, 255, 255, 0.9);
+      /* เปลี่ยนสีพื้นหลังของการ์ดและทำให้มีความโปร่งใส */
+    }
+
+    .card h1 {
+      margin-bottom: 20px;
+      font-size: 32px;
+      text-align: center;
+      color: #333333;
+      text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+      /* เปลี่ยนขนาดและเพิ่มเงาให้ข้อความในการ์ด */
+    }
+
+    .form-group {
+      margin-bottom: 30px;
+    }
+
+    .form-label {
+      font-weight: bold;
+      color: #333333;
+      /* เปลี่ยนสีของข้อความ Label */
+    }
+
+    .form-control {
+      border-radius: 20px;
+    }
+
+    #regForm {
+      text-decoration: none;
+      color: #0D6EFD;
+      /* เปลี่ยนสีของลิงก์ Register */
+      font-weight: bold;
+    }
+
+    #btnLogin {
+      border-radius: 20px;
+      background-color: #0D6EFD;
+      /* เปลี่ยนสีพื้นหลังของปุ่ม Login */
+      border-color: #0D6EFD;
+      /* เปลี่ยนสีของเส้นขอบของปุ่ม Login */
+    }
+
+    #btnLogin:hover {
+      background-color: #0B5ED7;
+      /* เปลี่ยนสีพื้นหลังของปุ่ม Login เมื่อ hover */
+      border-color: #0B5ED7;
+      /* เปลี่ยนสีของเส้นขอบของปุ่ม Login เมื่อ hover */
+    }
+
+    .left-section {
+      width: 50%;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .left-section img {
+      max-width: 100%;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      /* เพิ่มเงาให้กับรูปภาพ */
+    }
+
+    .text-center {
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="row">
+        <div class="col-md-6 left-section">
+          <img src="/public/img/meetingroom_3.jpg" alt="Room Reservation Image">
+        </div>
+        <div class="col-md-6">
+          <h1>Room Reservation System</h1>
+          <form id="formLogin">
+            <h3 class="text-center">Login</h3>
+            <div class="form-group">
+              <label for="username" class="form-label">Username</label>
+              <input type="username" id="username" name="username" class="form-control" placeholder="Enter Username">
+            </div>
+            <div class="form-group">
+              <label for="password" class="form-label">Password</label>
+              <input type="password" id="password" name="password" class="form-control" placeholder="Enter Password">
+            </div>
+            <div class="mb-3 text-center">Not a member? <a href="regist.html" id="regForm">Register</a></div>
+            <div class="form-group text-center">
+              <button id="btnLogin" type="submit" class="btn btn-dark form-control">Login</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    const formLogin = document.querySelector('#formLogin');
+    formLogin.onsubmit = async function (e) {
+      e.preventDefault();
+      const username = formLogin['username'].value;
+      const password = formLogin['password'].value;
+      const options = {
+        method: 'post',
+        headers: { "Content-Type": 'application/json' },
+        body: JSON.stringify({ "username": username, "password": password })
+      }
+      try {
+        const response = await fetch('/login', options);
+        if (response.ok) {
+          const data = await response.json();
+          Swal.fire({
+            icon: 'success',
+            title: 'Login Successful',
+            text: 'Redirecting...',
+            showConfirmButton: false,
+            timer: 1500
+          }).then(() => {
+            const role = data.role;
+            switch (role) {
+              case 1:
+                window.location.href = "/G10HomeUser";
+                break;
+              case 2:
+                window.location.href = "/G10Homelecturer";
+                break;
+              case 3:
+                window.location.href = "/G10Homestaff";
+                break;
+              default:
+                console.error("Unknown role");
+                break;
+            }
+          });
+        } else if (response.status === 401) {
+          const data = await response.text();
+          throw Error(data);
+        } else {
+          throw Error('Connection error');
+        }
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Login Failed',
+          text: error.message
+        });
+      }
+    }
+  </script>
+</body>
+
+</html>

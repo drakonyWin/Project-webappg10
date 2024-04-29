@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/public/css/css/style.css">
+    <!-- Internal CSS -->
+    <style>
+          nav {
+            color: #636363;
+            background-color: white;
+          }
+        .bgc1 {
+            background-color: #D9D9D9;
+        }
+        .container{
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        footer {
+        background-color: white;
+        color: #636363;
+        text-align: center;
+        padding: 10px 0;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+    }
+
+    </style>
+</head>
+
+<body class="bgc1">
+    <!-- nav bar -->
+    <nav class=" p-4">
+        <div class="row px-4">
+            <div class="col-3 h2 textc1 pt-2 ">
+                <a href="/views/G10Homelecturer.html" class="textc1">Home</a>
+            </div>
+            <div class="col text-end h4 pt-2">
+                <!-- เปลี่ยนlinkเป็น.htmlนะ -->
+                <a href="/views/roomlist_lecturer.html" class="textc1 mx-3">Room List</a>
+                <a href="/views/history_lecturer.html" class="mx-3 textc1">History</a>
+                <a href="/views/G10Daslecturer.html" class="mx-2 textc1">Dashboard</a>
+                <button id="signoutBTN" class="btn btn-dark mx-3">Logout</button>
+            </div>
+        </div>
+    </nav>
+    <!-- แก้dashboard -->
+    <div class="container text-center">
+        <h2 class="chart-heading">Dashboard</h2>
+        <div class="programming-stats">
+            <div class="chart-container">
+                <canvas class="my-chart"></canvas>
+            </div>
+    
+            <div class="details">
+                <ul></ul>
+            </div>
+        </div>
+    </div>
+    <footer class=" p-4">
+        <div class="row px-4">
+            <div class="col-3 h2 textc1 pt-2 ">
+                <h3>Room Reservation System</h3>
+            </div>
+    </footer>
+ <script>
+    document.getElementById("signoutBTN").addEventListener("click", function(){
+        Swal.fire({
+            title: "See you again",
+            text: "Logout success",
+            icon: "info"
+          }).then(() => {
+            window.location.href = "/views/G10Login.html"
+          })
+    })
+ </script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/public/js/js/main.js"></script>
+</body>
+
+</html>

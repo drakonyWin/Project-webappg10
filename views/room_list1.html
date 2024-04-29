@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoomList</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11">
+    <style>
+        /* Global styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .card {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 25px;
+            width: 380px;
+            background-color: #f9f9f9;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .room-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .room-info i {
+            margin-right: 10px;
+        }
+
+        .time-slot {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .time-slot span {
+            flex-grow: 1;
+        }
+
+        /* Status styles */
+        .status {
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .free {
+            background-color: #28a745;
+        }
+
+        .pending {
+            background-color: #ffc107;
+        }
+
+        .reserved {
+            background-color: #3f02c3;
+        }
+
+        .disabled {
+            background-color: #cd0000;
+        }
+
+        .available-button {
+            background-color: #ffffff;
+            color: #2f00ff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border: solid 1px #2f00ff;
+        }
+
+        .available-button:hover {
+            background-color: #000000;
+            color: #ffffff;
+            border: 1px solid #000000;
+        }
+
+        /* Navigation bar */
+        nav {
+            background-color: #343a40;
+            color: #fff;
+            padding: 10px 0;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin-right: 20px;
+        }
+
+        nav a:hover {
+            color: #ccc;
+        }
+
+        #signoutBTN {
+            background-color: #dc3545;
+            border: none;
+        }
+
+        #signoutBTN:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- nav bar -->
+    <nav class=" p-4">
+        <div class="row px-4">
+            <div class="col-3 h2 textc1 pt-2 ">
+                <a href="/G10HomeUser" class="textc1">Home</a>
+            </div>
+            <div class="col text-end h4 pt-2">
+                <a href="/room_list1" class="textc1 mx-3">Room List</a>
+                <a href="/history_student" class="mx-3 textc1">History</a>
+                <button id="signoutBTN" class="btn btn-dark mx-3">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <h2>RoomList</h2>
+    <div class="container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+        // Function to fetch room data from API and display on the webpage
+        async function fetchRoomData() {
+            try {
+                const response = await axios.get('/getroom');
+                const rooms = response.data;
+
+                const container = document.querySelector('.container');
+                container.innerHTML = ''; // Clear previous content
+
+                // Group rooms with the same name
+                const groupedRooms = groupRoomsByName(rooms);
+
+                // Create cards for each grouped room
+                groupedRooms.forEach(roomGroup => {
+                    const card = document.createElement('div');
+                    card.classList.add('card');
+
+                    const roomInfo = document.createElement('div');
+                    roomInfo.classList.add('room-info');
+
+                    const roomIcon = document.createElement('i');
+
+                    roomInfo.appendChild(roomIcon);
+
+                    const roomName = document.createElement('h3');
+                    roomName.textContent = roomGroup[0].room_name;
+                    roomInfo.appendChild(roomName);
+
+
+
+                    card.appendChild(roomInfo);
+
+                    const hr = document.createElement('hr');
+                    card.appendChild(hr);
+
+
+                    // Adjust the logic to include both start and end times
+                    roomGroup.forEach(room => {
+                        const timeSlotContainer = document.createElement('div');
+                        timeSlotContainer.classList.add('time-slot');
+
+                        const timeRange = document.createElement('span');
+                        timeRange.textContent = `${room.start_time} - ${room.end_time}`;
+                        timeSlotContainer.appendChild(timeRange);
+
+                        const status = document.createElement('span');
+                        status.classList.add('status', room.status.toLowerCase());
+                        status.textContent = room.status;
+                        timeSlotContainer.appendChild(status);
+
+                        if (room.status.toLowerCase() === 'free') {
+                            const bookButton = document.createElement('button');
+                            bookButton.textContent = 'Booking';
+                            bookButton.classList.add('status', 'available-button');
+                            bookButton.onclick = () => handleBookButtonClick(room, `${room.start_time} - ${room.end_time}`);
+                            timeSlotContainer.appendChild(bookButton);
+                        }
+
+                        card.appendChild(timeSlotContainer);
+                    });
+
+
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Error fetching room data:', error);
+                // Show error message or take further action as needed
+            }
+        }
+
+        // Group rooms with the same name
+        function groupRoomsByName(rooms) {
+            const groupedRooms = [];
+            const roomNames = new Set(rooms.map(room => room.room_name));
+
+            roomNames.forEach(roomName => {
+                const roomsWithName = rooms.filter(room => room.room_name === roomName);
+                groupedRooms.push(roomsWithName);
+            });
+
+            return groupedRooms;
+        }
+
+        // Function to handle click event on "Book" button
+        async function handleBookButtonClick(room, time) {
+            const title = `ROOM ${room.room_name} 
+            TIME ${time}`;
+            const reason = await Swal.fire({
+                title: title,
+                input: 'text',
+                inputLabel: 'Reason for booking',
+                inputPlaceholder: 'Enter your reason',
+                showCancelButton: true,
+            });
+
+            if (reason.isConfirmed) {
+                try {
+                    // Call your API to book the room
+                    await bookRoom(room.room_name, time, reason.value);
+                    // Refresh room data after booking
+                    fetchRoomData();
+                } catch (error) {
+                    console.error('Error occurred while booking room:', error);
+                    // Show error message or take further action as needed
+                }
+            }
+        }
+
+
+        // Function to book the room
+        async function bookRoom(room, time, reason) {
+            try {
+                const response = await axios.post('/api/form', {
+                    room: room,
+                    time: time,
+                    reason: reason
+                });
+                // Assuming your API responds with success, you can handle it here
+                console.log('Room booked successfully');
+            } catch (error) {
+                console.error('Error occurred while booking room:', error);
+                throw error;
+            }
+        }
+
+
+        // Call fetchRoomData function initially
+        fetchRoomData();
+
+        document.getElementById("signoutBTN").addEventListener("click", function () {
+            Swal.fire({
+                title: "See you again",
+                text: "Logout success",
+                icon: "info"
+            }).then(() => {
+                window.location.href = "login"
+            })
+        })
+
+    </script>
+</body>
+
+</html>
